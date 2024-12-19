@@ -1,28 +1,71 @@
-const root = "neerajsingh@Neerajs-MacBook-Pro ";
-let path = "neerajsingh@Neerajs-MacBook-Pro /users/neerajSingh";
+const root = "nutshell";
+const currentDirPath = "/users/neerajSingh";
+let path = "nutshell /users/neerajSingh";
 let currentDir = "/users/neerajSingh";
+const directories = ["workspace", "js", "assignment"];
+const [workspace, js, assignment] = [["file.js", "file2.js"],
+["array1.js", "array2.js"], ["pattern1.js", "pattern2.js"]];
+const files = [workspace, js, assignment];
 
-const echoCommmand = function (args) {
+function echoCommmand(args) {
   return args.join("");
+}
+
+const moveBack = function () {
+  currentDir = currentDir.split("/");
+  currentDir.pop();
+  currentDir = currentDir.join("/");
+  path = root + currentDir;
+  return;
+};
+
+const reset = function () {
+  path = root;
+  currentDir = currentDirPath;
+  return;
 };
 
 const changeDirectory = function (args) {
   if (args === "..") {
-    currentDir = currentDir.split("/");
-    currentDir.pop();
-    currentDir = currentDir.join("/");
-    args = "";
+    return moveBack();
   }
 
   if (args === "~") {
-    path = root;
-    currentDir = "/users/neerajSingh";
+    return reset();
+  }
+
+  if (directories.includes(args) && !args.endsWith(".js")) {
+    path = root + currentDir + "/" + args;
+    currentDir = currentDir + "/" + args;
     return;
   }
 
-  path = root + currentDir + "/" + args;
-  currentDir = currentDir + "/" + args;
-  return;
+  return "No such directory";
+
+};
+
+const listStyleCommand = function () {
+  const lastDir = currentDir.split("/").at(-1);
+  const lastDirIndex = directories.indexOf(lastDir);
+
+  if (lastDir === "neerajSingh") {
+    return directories.join("  ");
+  }
+
+  return (files[lastDirIndex]).join("  ");
+};
+
+const touchCommand = function (args) {
+  const lastDir = currentDir.split("/").at(-1);
+  const lastDirIndex = directories.indexOf(lastDir);
+  files[lastDirIndex].push(args);
+};
+
+const externalCommand = function (command, args) {
+  switch (command) {
+    case "ls": return listStyleCommand();
+    case "touch": return touchCommand(args);
+  }
 };
 
 const executeCommand = function (runCommand, args) {
@@ -31,7 +74,7 @@ const executeCommand = function (runCommand, args) {
     case "cd": return changeDirectory(args.join(""));
     case "pwd": return currentDir;
 
-    default: return "nutshell : command not found";
+    default: return externalCommand(runCommand, args);
   }
 };
 
